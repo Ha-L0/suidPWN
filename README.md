@@ -5,9 +5,7 @@ Speeding up identifying which binaries with a SUID flag may lead to root access
 We made this tool while working and different CTF boxes.  
 The reason was to fast identify SUID binaries which are vulnerable to an LPE.  
   
-Usually when you are checking for SUID binaries on a target you get a lot binaries out of the `find` command.  
-Then you may check every binary you do not know on `gtfobins`. With this approach it is easy to overlook a juicy binary.  
-To avoid this, you can use suidPWN where you just have to paste your `find` output into and it tells you if a binary is on `gtfobins` and vulnerable to privilege escalation.
+Usually when you are checking for SUID binaries on a target you get a lot binaries out of the `find` command. Then you may check every binary you do not know on `gtfobins`. With this approach it is easy to overlook a juicy binary. To avoid this, you can use suidPWN where you just have to paste your `find` output into and it tells you if a binary is on `gtfobins` and vulnerable to privilege escalation.
   
 All the credits for the local privilege escalation techniques go to `gtfobins`. These guys are awesome! <3  
 
