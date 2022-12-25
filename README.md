@@ -7,9 +7,9 @@ The reason was to fast identify SUID binaries which are vulnerable to an LPE.
   
 Usually when you are checking for SUID binaries on a target you get a lot binaries out of the `find` command. Then you may check every binary you do not know on `gtfobins`. With this approach it is easy to overlook a juicy binary.  
   
-> To avoid this, you can use suidPWN where you just have to paste your `find` output and it tells you if a binary is on `gtfobins` and vulnerable to privilege escalation.
+To avoid this, you can use suidPWN where you just have to paste your `find` output and it tells you if a binary is on `gtfobins` and vulnerable to privilege escalation.
   
-All the credits for the local privilege escalation techniques go to `gtfobins`. These guys are awesome! <3  
+> All the credits for the local privilege escalation techniques go to `gtfobins`. These guys are awesome! <3  
 
 # hints
 - update the `binaries` files regulary
