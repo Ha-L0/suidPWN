@@ -1,50 +1,61 @@
-import httplib2
-from bs4 import BeautifulSoup, SoupStrainer
-import html.parser
+from git import Repo 
+import shutil
+import os
+import base64
 
-binaries = set()
+temp_clone_dir = "git_temp"
+gtfobins_repo = "https://github.com/GTFOBins/GTFOBins.github.io.git"
+binary_folder = "_gtfobins"
+gtfobins_base_url = "https://gtfobins.github.io/gtfobins/"
+output_filename = "binaries"
+output_file_content = ""
 
-print("[*] Getting binary list from gtfobins...")
-http = httplib2.Http()
-status, response = http.request('https://github.com/GTFOBins/GTFOBins.github.io/tree/master/_gtfobins')
+def list_files_in_directory(directory):
+    try:
+        # List all files in the directory
+        files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+        return files
+    except FileNotFoundError:
+        return f"The directory '{directory}' does not exist."
 
-for link in BeautifulSoup(response, parse_only=SoupStrainer('a'), features="html.parser"):
-    if link.has_attr('href'):
-        linkOnPage = link['href']
-        if linkOnPage.endswith('.md'):
-            binaryLink = "https://gtfobins.github.io/gtfobins/"
-            cur_binary = linkOnPage.split('/')
-            cur_binary = cur_binary[len(cur_binary)-1]
-            cur_binary = cur_binary.replace('.md', '')
-            binaries.add(cur_binary + ',' + binaryLink + cur_binary + ',<BLANK>\n')
+# rm old temp dir and create new one (if it still exists)
+try:
+    shutil.rmtree(temp_clone_dir)
+except:
+    pass
+os.makedirs(temp_clone_dir, exist_ok=True)
 
-# take care that already saved escalations do not get deleted when performing an update
-saveSet = set()
+# get gtfobins repository and extract binaries
+print("[+] Cloning gtfo repo to extract binary infos.")
+Repo.clone_from(gtfobins_repo, temp_clone_dir)
+binary_files = list_files_in_directory(temp_clone_dir + "/" + binary_folder)
 
-f = open('binaries', 'r')
-fc = f.readlines()
+# go through binaries, look for suid and extract technique
+for binary in binary_files:
+    f = open(temp_clone_dir + "/" + binary_folder + "/" + binary, "r")
+    temp_binary_content = f.readlines()
+    f.close()
+
+    binary_payload = ""
+    store = 0
+    for line in temp_binary_content:
+        binary_payload += line
+        if "suid:" in line:
+            store = 1
+    
+    if store == 1:
+        payload_write = str(base64.b64encode(binary_payload.encode()))
+        payload_write = payload_write[2:len(payload_write)-1]
+        output_file_content += binary.split(".")[0] + "," + gtfobins_base_url + binary.split(".")[0] + "," + payload_write + "\n"
+
+print("[+] Writing binaries file.")
+# create binary file
+f = open("binaries", "w")
+f.write(output_file_content)
 f.close()
 
-for line in fc:
-    origLine = line
-    line = line.split(',')
-    if line[2].strip() != '<BLANK>':
-        saveSet.add(origLine)
-
-# create suid file
-f = open('binaries', 'w')
-
-for item in binaries:
-    itemToSave = 0
-    for saveItem in saveSet:
-        if item.split(',')[0] == saveItem.split(',')[0]:
-            itemToSave = 1
-
-    if itemToSave == 0:
-        f.write(item)
-
-for item in saveSet:
-    f.write(item)
-
-f.close()
-print("[+] Done.")
+# clean up
+try:
+    shutil.rmtree(temp_clone_dir)
+except:
+    pass
