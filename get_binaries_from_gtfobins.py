@@ -26,7 +26,7 @@ except:
 os.makedirs(temp_clone_dir, exist_ok=True)
 
 # get gtfobins repository and extract binaries
-print("[+] Cloning gtfo repo to extract binary infos.")
+print("[*] Cloning gtfobins repo to extract binary infos...")
 Repo.clone_from(gtfobins_repo, temp_clone_dir)
 binary_files = list_files_in_directory(temp_clone_dir + "/" + binary_folder)
 
@@ -48,14 +48,16 @@ for binary in binary_files:
         payload_write = payload_write[2:len(payload_write)-1]
         output_file_content += binary.split(".")[0] + "," + gtfobins_base_url + binary.split(".")[0] + "," + payload_write + "\n"
 
-print("[+] Writing binaries file.")
 # create binary file
 f = open("binaries", "w")
 f.write(output_file_content)
 f.close()
 
 # clean up
+print("[*] Cleaning up...")
 try:
     shutil.rmtree(temp_clone_dir)
 except:
     pass
+
+print("[+] Done.")

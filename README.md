@@ -36,7 +36,8 @@ example usage: python3 suidPWN.py
 ## updating the `binaries` file
 ```bash
 $ python3 get_binaries_from_gtfobins.py
-[*] Getting binary list from gtfobins...
+[*] Cloning gtfobins repo to extract binary infos...
+[*] Cleaning up...
 [+] Done.
 ```
 
